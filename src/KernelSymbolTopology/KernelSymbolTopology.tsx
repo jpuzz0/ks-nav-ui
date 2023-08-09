@@ -12,15 +12,12 @@ import {
   ComponentFactory,
   TopologyView,
   TopologyControlBar,
-  GRAPH_LAYOUT_END_EVENT,
   PointIface,
   Controller,
   EdgeModel,
   NodeModel,
   TaskEdge,
   TaskNode,
-  observer,
-  RunStatus,
 } from "@patternfly/react-topology";
 
 import { getControlButtons, getLayoutFactory, setStartNodePosition } from "./utils";
@@ -48,102 +45,123 @@ export const KernelSymbolTopology = ({
   const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
   const startPointX = startPoint?.x;
   const startPointY = startPoint?.y;
-
-  const nodeNameDictionary: Record<string, string[]> = React.useMemo(() => ({}), []);
-
-  const edges = realDataSample[0].children.reduce((acc: EdgeModel[], statement, index) => {
-    if (statement.type === "edge_stmt") {
-      const source = statement.edge_list?.[0].id || `${ModelType.Edge}-source-${index}`;
-      const target = statement.edge_list?.[1].id || `${ModelType.Edge}-target-${index}`;
-      const id = `${ModelType.Edge}-${source}-${target}`;
-
-      acc.push({
-        id,
-        source,
-        target,
-        type: ModelType.Edge,
-      });
-
-      if (!nodeNameDictionary[source]) {
-        nodeNameDictionary[source] = [target];
-      } else {
-        nodeNameDictionary[source].push(target);
-      }
-
-      if (!nodeNameDictionary[target]) {
-        nodeNameDictionary[target] = [];
-      }
-    }
-
-    return acc;
-  }, []);
-
-  const nodes: NodeModel[] = Object.entries(nodeNameDictionary).map(([nodeName, nodeTargets]) => ({
-    id: nodeName,
-    label: nodeName,
-    type: ModelType.Node,
-    runAfterTasks: nodeTargets,
-    height: 32,
-    width: 134,
-    data: {
-      status: RunStatus.Succeeded,
-    },
-  }));
-
-  const controller: Controller = React.useMemo(() => {
-    const visual = new Visualization();
-
-    visual.registerComponentFactory(getComponentFactory as ComponentFactory);
-    visual.registerLayoutFactory(getLayoutFactory);
-
-    visual.fromModel(
-      {
-        graph: {
-          layout: "PipelineDagreLayout",
-          id: "g1",
-          type: ModelType.Graph,
-        },
-      },
-      true
-    );
-
-    return visual;
-  }, []);
+  const controllerRef = React.useRef<Controller>();
+  const controller = controllerRef.current;
+  const [nodeNameDictionary, setNodeNameDictionary]  = React.useState<Record<string, string[]>>({});
 
   React.useEffect(() => {
-    const graphLayoutEndEvent = () =>
+    const updatedDictionary: Record<string, string[]> = {};
+    realDataSample[0].children.forEach((statement, index) => {
+      if (statement.type === "edge_stmt") {
+        const source = statement.edge_list?.[0].id || `${ModelType.Edge}-source-${index}`;
+        const target = statement.edge_list?.[1].id || `${ModelType.Edge}-target-${index}`;
+        if (!updatedDictionary[source]) {
+          updatedDictionary[source] = [target];
+        } else {
+          updatedDictionary[source].push(target);
+        }
+
+        if (!updatedDictionary[target]) {
+          updatedDictionary[target] = [];
+        }
+      }
+    });
+    setNodeNameDictionary(updatedDictionary);
+  }, []);
+
+  const nodes: NodeModel[] = React.useMemo(() => {
+      const updatedNodes = Object.entries(nodeNameDictionary).map(([nodeName, nodeTargets]) => ({
+        id: nodeName,
+        label: nodeName,
+        type: ModelType.Node,
+        runAfterTasks: nodeTargets,
+        height: 32,
+        width: 134,
+      }));
+      return updatedNodes.slice(0, 20);
+    }, [nodeNameDictionary]);
+
+  const edges = React.useMemo(() => {
+    const updatedEdges: EdgeModel[] = [];
+    Object.entries(nodeNameDictionary).forEach(([nodeName, nodeTargets]) => {
+      nodeTargets.forEach((nodeTarget) => {
+        const source = nodeName;
+        const target = nodeTarget;
+        const id = `${ModelType.Edge}-${source}-${target}`;
+        if (nodes.find((n) => n.id === source && nodes.find((n) => n.id === target))) {
+          updatedEdges.push({
+            id,
+            source,
+            target,
+            type: ModelType.Edge,
+          });
+        }
+      });
+    });
+    return updatedEdges;
+  }, [nodeNameDictionary, nodes]);
+
+  const graphLayoutEndEvent = React.useCallback((controller: Controller) =>
+    setStartNodePosition(
+      controller,
+      startNodeId,
+      startPointX && startPointY ? { x: startPointX, y: startPointY } : undefined
+    ), [startNodeId, startPointX, startPointY]);
+
+  React.useEffect(() => {
+    if (!nodes) {
+      return;
+    }
+
+    const selectionEvent = ([selectedId]: any) => {
+      const selectedNodeTargets = nodeNameDictionary[selectedId] ?? [];
+      setSelectedIds([selectedId, ...selectedNodeTargets]);
+    }
+
+    if (!controller) {
+      const visual = new Visualization();
+
+      visual.registerComponentFactory(getComponentFactory as ComponentFactory);
+      visual.registerLayoutFactory(getLayoutFactory);
+
+      visual.addEventListener(SELECTION_EVENT, selectionEvent);
+
+      visual.fromModel(
+        {
+          nodes,
+          edges,
+          graph: {
+            layout: "PipelineDagreLayout",
+            id: "g1",
+            type: ModelType.Graph,
+          },
+        },
+        false,
+      );
+      controllerRef.current = visual;
+      controllerRef.current.addEventListener(SELECTION_EVENT, selectionEvent);
+      return () => {
+        controllerRef.current?.removeEventListener(SELECTION_EVENT, selectionEvent);
+      }
+    }
+    controller.fromModel({ nodes, edges }, true);
+    controller.getGraph().layout();
+    controller.addEventListener(SELECTION_EVENT, selectionEvent);
+
+    return () => {
+      controller.removeEventListener(SELECTION_EVENT, selectionEvent);
+    }
+  }, [controller, edges, nodes, graphLayoutEndEvent, nodeNameDictionary]);
+
+  React.useEffect(() => {
+    if (controller && startNodeId) {
       setStartNodePosition(
         controller,
         startNodeId,
         startPointX && startPointY ? { x: startPointX, y: startPointY } : undefined
       );
-    const selectionEvent = ([selectedId]: any) => {
-      const selectedNodeTargets = nodeNameDictionary[selectedId] ?? [];
-      setSelectedIds([selectedId, ...selectedNodeTargets]);
-    };
-
-    controller.addEventListener(SELECTION_EVENT, selectionEvent);
-
-    if (startNodeId) {
-      controller.addEventListener(GRAPH_LAYOUT_END_EVENT, graphLayoutEndEvent);
     }
-
-    controller.fromModel(
-      {
-        nodes: nodes.slice(0, 20),
-        edges: edges.slice(0, 20),
-      },
-      true
-    );
-
-    // Re-run the layout on model change
-    controller.getGraph().layout();
-
-    return () => {
-      controller.removeEventListener(SELECTION_EVENT, selectionEvent);
-      controller.removeEventListener(GRAPH_LAYOUT_END_EVENT, graphLayoutEndEvent);
-    };
-  }, [controller, edges, layout, nodeNameDictionary, nodes, startNodeId, startPointX, startPointY]);
+  }, [controller, startNodeId, startPointX, startPointY]);
 
   return !!controller?.hasGraph() ? (
     <TopologyView
@@ -166,15 +184,8 @@ const getComponentFactory = (kind: ModelKind) => {
     case ModelKind.graph:
       return withPanZoom()(GraphComponent);
     case ModelKind.node:
-      return withSelection()(DemoTaskNode);
+      return withSelection()(TaskNode);
     case ModelKind.edge:
       return TaskEdge;
   }
 };
-
-const DemoTaskNodeWithoutObserver: React.FunctionComponent<any> = (props) => {
-  const data = props.element.getData();
-  return <TaskNode {...props} status={data?.status} />;
-};
-
-const DemoTaskNode = observer(DemoTaskNodeWithoutObserver);

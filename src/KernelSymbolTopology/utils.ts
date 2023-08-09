@@ -19,19 +19,21 @@ export const setStartNodePosition = (
   startNodeId: string | undefined,
   startPoint: PointIface | undefined
 ): void => {
+  console.log(`startNodeId: `, startNodeId);
   const graph = visual.getGraph();
-  const startNodePosition = graph
+  const startNode = graph
     .getNodes()
-    .find((node, index) => node.getId() === startNodeId || index === 0)
-    ?.getPosition();
+    .find((node, index) => node.getId() === startNodeId);
 
-  if (startNodePosition) {
-    graph.setPosition(
-      new Point(
-        startNodePosition.x + (startPoint?.x || 0),
-        startNodePosition.y + (startPoint?.y || 0)
-      )
-    );
+  if (startNode) {
+    const startNodePosition = startNode.getPosition();
+    const bounds = graph.getBounds();
+    const newPosition = new Point(
+      bounds.x + (bounds.width / 2) - startNodePosition.x + (startPoint?.x || 0),
+      bounds.y + (bounds.height / 2) - startNodePosition.y + (startPoint?.y || 0)
+    )
+
+    graph.setPosition(newPosition);
   }
 };
 
