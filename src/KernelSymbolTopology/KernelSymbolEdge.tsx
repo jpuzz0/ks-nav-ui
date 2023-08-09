@@ -11,6 +11,9 @@ import {
   Point,
   getEdgeStyleClassModifier,
   observer,
+  GraphElement,
+  integralShapePath,
+  isEdge,
 } from "@patternfly/react-topology";
 
 interface KernelSymbolEdgeProps {
@@ -81,4 +84,42 @@ export const KernelSymbolEdge = ({
   );
 };
 
-export default observer(KernelSymbolEdge);
+interface CustomTaskEdgeProps {
+  /** The graph edge element to represent */
+  element: GraphElement;
+  /** Additional classes added to the edge */
+  className?: string;
+  /** Offset for integral shape path */
+  nodeSeparation?: number;
+}
+
+type CustomTaskEdgeInnerProps = Omit<CustomTaskEdgeProps, "element"> & { element: Edge };
+
+const CustomTaskEdgeInner = observer(
+  ({ element, className, nodeSeparation }: CustomTaskEdgeInnerProps) => {
+    const startPoint = element.getStartPoint();
+    const endPoint = element.getEndPoint();
+    const endPointAlt = new Point(endPoint.x - 10, endPoint.y);
+    const groupClassName = css(styles.topologyEdge, className);
+
+    return (
+      <g data-test-id="task-handler" className={groupClassName} fillOpacity={0}>
+        <path d={integralShapePath(startPoint, endPointAlt)} transform="translate(0.5,0.5)" />
+
+        <DefaultConnectorTerminal
+          isTarget
+          edge={element}
+          size={5}
+          terminalType={EdgeTerminalType.directional}
+        />
+      </g>
+    );
+  }
+);
+
+export const CustomTaskEdge = ({ element, ...rest }: CustomTaskEdgeProps) => {
+  if (!isEdge(element)) {
+    throw new Error("TaskEdge must be used only on Edge elements");
+  }
+  return <CustomTaskEdgeInner element={element as Edge} {...rest} />;
+};

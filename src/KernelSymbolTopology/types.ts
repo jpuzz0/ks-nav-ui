@@ -9,3 +9,10 @@ export interface SymbolData {
   nodes: NodeModel[];
   edges: EdgeModel[];
 }
+
+export enum ModelType {
+  Graph = "graph",
+  Group = "group",
+  Node = "node",
+  Edge = "edge",
+}

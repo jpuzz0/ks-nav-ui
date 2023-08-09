@@ -1,10 +1,8 @@
 import {
   BreadthFirstLayout,
   Controller,
-  EdgeModel,
   Graph,
   Layout,
-  NodeModel,
   PipelineDagreLayout,
   Point,
   PointIface,
@@ -14,52 +12,12 @@ import {
   createTopologyControlButtons,
   defaultControlButtonsOptions,
 } from "@patternfly/react-topology";
-import { example } from "../exampleData";
-import { SymbolData, TopologyLayout } from "./types";
-
-// Eventually the example data will be fetched and this will be a
-// custom hook where we'll have a fetch on render within a React effect.
-export const getSymbolData = (): SymbolData => {
-  const nodeNameSet = new Set<string>();
-
-  const edges = example[0].children.reduce((acc: EdgeModel[], statement, index) => {
-    if (statement.type === "edge_stmt") {
-      const source = statement.edge_list?.[0].id || `edge-source-${index}`;
-      const target = statement.edge_list?.[1].id || `edge-target-${index}`;
-      const id = `edge-${source}-${target}`;
-
-      acc.push({
-        id,
-        source,
-        target,
-        type: "edge",
-      });
-
-      nodeNameSet.add(source);
-      nodeNameSet.add(target);
-    }
-
-    return acc;
-  }, []);
-
-  const nodes: NodeModel[] = [...nodeNameSet].map((nodeName) => ({
-    id: nodeName,
-    label: nodeName,
-    type: "node",
-    width: 45,
-    height: 35,
-    style: {
-      padding: [45, 45],
-    },
-  }));
-
-  return { edges, nodes };
-};
+import { TopologyLayout } from "./types";
 
 export const setStartNodePosition = (
   visual: Visualization | Controller,
   startNodeId: string | undefined,
-  startPoint: PointIface
+  startPoint: PointIface | undefined
 ): void => {
   const graph = visual.getGraph();
   const startNodePosition = graph
@@ -69,14 +27,17 @@ export const setStartNodePosition = (
 
   if (startNodePosition) {
     graph.setPosition(
-      new Point(startNodePosition.x + startPoint.x, startNodePosition.y + startPoint.y)
+      new Point(
+        startNodePosition.x + (startPoint?.x || 0),
+        startNodePosition.y + (startPoint?.y || 0)
+      )
     );
   }
 };
 
 export const getControlButtons = (
   controller: Controller,
-  startPoint: PointIface,
+  startPoint: PointIface | undefined,
   startNodeId?: string
 ): TopologyControlButton[] => {
   const graph = controller.getGraph();
@@ -97,7 +58,7 @@ export const getControlButtons = (
 
       if (startNodeId) {
         setStartNodePosition(controller, startNodeId, startPoint);
-      } else {
+      } else if (startPoint) {
         graph.setPosition(new Point(startPoint.x, startPoint.y));
       }
     }),

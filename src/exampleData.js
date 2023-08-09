@@ -1,4 +1,54 @@
-export const example = [
+export const NODES = [
+  {
+    id: "node-0",
+    type: "DEFAULT_TASK_NODE",
+    label: "Node 0",
+  },
+  {
+    id: "node-1",
+    type: "DEFAULT_TASK_NODE",
+    label: "Node 1",
+  },
+  {
+    id: "node-2",
+    type: "DEFAULT_TASK_NODE",
+    label: "Node 2",
+  },
+  {
+    id: "node-3",
+    type: "DEFAULT_TASK_NODE",
+    label: "Node 3",
+  },
+  {
+    id: "node-4",
+    type: "DEFAULT_TASK_NODE",
+    label: "Node 4",
+  },
+  {
+    id: "node-5",
+    type: "DEFAULT_TASK_NODE",
+    label: "Node 5",
+  },
+];
+
+export const EDGES: any = [
+  {
+    id: "edge-node-4-node-5",
+    type: "DEFAULT_EDGE",
+    source: "node-4",
+    target: "node-5",
+    edgeStyle: "default",
+  },
+  {
+    id: "edge-node-0-node-2",
+    type: "DEFAULT_EDGE",
+    source: "node-0",
+    target: "node-2",
+    edgeStyle: "default",
+  },
+];
+
+export const realDataSample = [
   {
     type: "digraph",
     children: [
