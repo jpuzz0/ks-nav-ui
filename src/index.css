@@ -1,13 +1,65 @@
+@import "~@patternfly/patternfly/patternfly.css";
+@import "~@patternfly/patternfly/patternfly-addons.css";
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+}
+
 body {
+  display: flex;
+  align-items: stretch;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+    "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+/* Remove text outline for Topology task nodes */
+.pf-topology-pipelines__pill-text {
+  outline: 0;
+}
+
+/* Custom drawer styles */
+.pf-v5-c-drawer__panel {
+  box-shadow: unset !important;
+}
+
+.pf-v5-c-drawer__splitter {
+  padding: 7px;
+  border-top: 1px #d2d2d2 solid;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.pf-v5-c-drawer__splitter-handle {
+  padding-bottom: 1px;
+  position: unset;
+}
+
+/* Custom breadcrumb styles */
+#file-breadcrumb > ol {
+  flex-wrap: nowrap;
+}
+
+.pf-topology__node__action-icon {
+  font-size: 13px;
+}
+
+/* Custom nav styles */
+.pf-v5-c-nav__link {
+  cursor: default;
+}
+
+/* Fix alignment of help icons with FormGroup label text */
+.pf-v5-c-form__group-label {
+  display: flex;
+  align-items: flex-start;
 }
