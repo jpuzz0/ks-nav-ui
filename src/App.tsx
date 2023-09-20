@@ -1,29 +1,22 @@
-import React from "react";
-import {
-  BrowserRouter,
-  Route,
-  Routes,
-  Navigate,
-  useNavigate,
-  useSearchParams,
-} from "react-router-dom";
+import React from 'react';
+import { BrowserRouter, Route, Routes, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 
-import { configure } from "mobx";
+import { configure } from 'mobx';
 
-import { KsNavContextProvider, useKsNavContext } from "./context";
-import { RoutePath } from "./types";
-import { DatasetSearchPage, FileDetailsPage } from "./pages";
-import { getFilePath } from "./utils";
-import { getFileDetails, getSymbol, getInstance } from "./mockApi";
-import { SymbolTopologySnapshot } from "./components";
+import { KsNavContextProvider, useKsNavContext } from './context';
+import { RoutePath } from './types';
+import { DatasetSearchPage, FileDetailsPage } from './pages';
+import { getFilePath } from './utils';
+import { getFileDetails, getSymbol, getInstance } from './mockApi';
+import { SymbolTopologySnapshot } from './components';
 
 // Prevent mobx warning triggered when updating the starting node position in the topology view
 configure({
-  enforceActions: "never",
+  enforceActions: 'never',
 });
 
 export const App = () => (
-  <div style={{ width: "100%", height: "100%", verticalAlign: "middle" }}>
+  <div style={{ width: '100%', height: '100%', verticalAlign: 'middle' }}>
     <KsNavContextProvider>
       <BrowserRouter>
         <KsNavRoutes />
@@ -36,8 +29,8 @@ const KsNavRoutes = () => {
   const navigate = useNavigate();
   const { setSelectedInstance, setSelectedSymbol } = useKsNavContext();
   const [searchParams] = useSearchParams();
-  const instanceId = searchParams.get("instanceId");
-  const symbolId = searchParams.get("symbolId");
+  const instanceId = searchParams.get('instanceId');
+  const symbolId = searchParams.get('symbolId');
 
   const navigateToFileDetails = React.useCallback(async () => {
     if (instanceId && symbolId) {

@@ -1,14 +1,16 @@
-# rh-ks-nav
+# ks-nav-ui
 
 React UI for Kernel Symbol Navigator
 
 ### Install and run
-* Using yarn:
+
+- Using yarn:
+
   ```
   yarn && yarn start
   ```
-  
-* Using npm:
+
+- Using npm:
   ```
   npm install && npm start
   ```

@@ -10093,7 +10093,7 @@ export const NODES = [
   },
 ];
 
-export const EDGES: any = [
+export const EDGES = [
   {
     id: "edge-node-4-node-5",
     type: "DEFAULT_EDGE",

@@ -1,5 +1,5 @@
-import React from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import React from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import {
   Button,
@@ -14,28 +14,19 @@ import {
   PageSidebar,
   PageSidebarBody,
   Switch,
-} from "@patternfly/react-core";
-import OutlinedWindowRestoreIcon from "@patternfly/react-icons/dist/esm/icons/outlined-window-restore-icon";
+} from '@patternfly/react-core';
+import OutlinedWindowRestoreIcon from '@patternfly/react-icons/dist/esm/icons/outlined-window-restore-icon';
 
-import { getFileDetailsById } from "../mockApi";
-import { FileDetails, RoutePath, FocusedSymbol, UrlParam } from "../types";
-import {
-  SymbolTopology,
-  FileSourceCode,
-  SymbolSearch,
-  FileNav,
-  FileBreadcrumb,
-} from "../components";
-import { useKsNavContext } from "../context";
+import { getFileDetailsById } from '../mockApi';
+import { FileDetails, RoutePath, FocusedSymbol, UrlParam } from '../types';
+import { SymbolTopology, FileSourceCode, SymbolSearch, FileNav, FileBreadcrumb } from '../components';
+import { useKsNavContext } from '../context';
 
 export const FileDetailsPage = () => {
   const navigate = useNavigate();
-  const { selectedInstance, selectedSymbol, setSelectedInstance, setSelectedSymbol } =
-    useKsNavContext();
+  const { selectedInstance, selectedSymbol, setSelectedInstance, setSelectedSymbol } = useKsNavContext();
   const [fileDetails, setFileDetails] = React.useState<FileDetails>();
-  const [focusedSymbol, setFocusedSymbol] = React.useState<FocusedSymbol | undefined>(
-    selectedSymbol
-  );
+  const [focusedSymbol, setFocusedSymbol] = React.useState<FocusedSymbol | undefined>(selectedSymbol);
   const [initialSelectedIds, setInitialSelectedIds] = React.useState<string[] | undefined>([]);
   const [isDrawerVisible, setIsDrawerVisible] = React.useState(true);
   const { fileId } = useParams<UrlParam.FileId>();
@@ -90,31 +81,24 @@ export const FileDetailsPage = () => {
       }
       mainContainerId="file-details-page"
     >
-      <Drawer isExpanded={isDrawerVisible} position="bottom" style={{ maxHeight: "100vh" }}>
+      <Drawer isExpanded={isDrawerVisible} position="bottom" style={{ maxHeight: '100vh' }}>
         <DrawerContent
           panelContent={
-            <DrawerPanelContent
-              isResizable
-              defaultSize="50%"
-              minSize="50%"
-              maxSize="calc(100% - 76px)"
-            >
+            <DrawerPanelContent isResizable defaultSize="50%" minSize="50%" maxSize="calc(100% - 76px)">
               <SymbolTopology
                 startNode={focusedSymbol}
                 initialSelectedIds={initialSelectedIds}
                 onSelect={onGraphElementSelect}
                 controlButtons={(selectedIds: string[]) => [
                   {
-                    id: "open-new-window-button",
+                    id: 'open-new-window-button',
                     icon: <OutlinedWindowRestoreIcon />,
-                    tooltip: "Open new window",
-                    ariaLabel: "Open new window",
+                    tooltip: 'Open new window',
+                    ariaLabel: 'Open new window',
                     callback: () =>
                       window.open(
-                        `${RoutePath.Graph}?${new URLSearchParams(
-                          selectedIds.map((id) => ["id", id])
-                        ).toString()}`,
-                        "_blank"
+                        `${RoutePath.Graph}?${new URLSearchParams(selectedIds.map((id) => ['id', id])).toString()}`,
+                        '_blank',
                       ),
                   },
                 ]}
@@ -124,29 +108,16 @@ export const FileDetailsPage = () => {
         >
           <DrawerContentBody
             style={{
-              maxHeight: isDrawerVisible ? "50%" : "100%",
+              maxHeight: isDrawerVisible ? '50%' : '100%',
             }}
           >
-            <Flex
-              direction={{ default: "column" }}
-              flexWrap={{ default: "nowrap" }}
-              style={{ height: "100%" }}
-            >
-              <Flex
-                justifyContent={{ default: "justifyContentSpaceBetween" }}
-                flexWrap={{ default: "nowrap" }}
-              >
+            <Flex direction={{ default: 'column' }} flexWrap={{ default: 'nowrap' }} style={{ height: '100%' }}>
+              <Flex justifyContent={{ default: 'justifyContentSpaceBetween' }} flexWrap={{ default: 'nowrap' }}>
                 <FileBreadcrumb fileName={fileDetails?.name} />
 
-                <FlexItem
-                  align={{ default: "alignRight" }}
-                  style={{ padding: "20px", paddingBottom: "12px" }}
-                >
-                  <Flex
-                    flexWrap={{ default: "nowrap" }}
-                    alignItems={{ default: "alignItemsCenter" }}
-                  >
-                    <div style={{ whiteSpace: "nowrap" }}>
+                <FlexItem align={{ default: 'alignRight' }} style={{ padding: '20px', paddingBottom: '12px' }}>
+                  <Flex flexWrap={{ default: 'nowrap' }} alignItems={{ default: 'alignItemsCenter' }}>
+                    <div style={{ whiteSpace: 'nowrap' }}>
                       <Switch
                         id="toggle-graph-switch"
                         label="Show graph"
@@ -172,9 +143,9 @@ export const FileDetailsPage = () => {
 
               <FlexItem
                 style={{
-                  padding: "20px",
-                  overflow: "scroll",
-                  height: "100%",
+                  padding: '20px',
+                  overflow: 'scroll',
+                  height: '100%',
                 }}
               >
                 <FileSourceCode

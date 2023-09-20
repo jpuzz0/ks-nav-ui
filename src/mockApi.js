@@ -1,23 +1,17 @@
-import React from "react";
-import { filesSample, fileDetailsSamples, instancesSample, symbolsSample } from "./exampleData";
+import React from 'react';
+import { filesSample, fileDetailsSamples, instancesSample, symbolsSample } from './exampleData';
 
 const mockDelay = Math.random() * 1000;
 
 export const getFileDetailsById = (fileId) => {
   return new Promise((resolve, reject) => {
-    setTimeout(
-      resolve(fileDetailsSamples.find((fileSample) => fileSample.id === fileId)),
-      Math.random() * 1000
-    );
+    setTimeout(resolve(fileDetailsSamples.find((fileSample) => fileSample.id === fileId)), Math.random() * 1000);
   });
 };
 
 export const getSymbol = (symbolId) => {
   return new Promise((resolve, reject) => {
-    setTimeout(
-      resolve(symbolsSample.find((symbolSample) => symbolSample.id === symbolId)),
-      Math.random() * 1000
-    );
+    setTimeout(resolve(symbolsSample.find((symbolSample) => symbolSample.id === symbolId)), Math.random() * 1000);
   });
 };
 
@@ -25,7 +19,7 @@ export const getInstance = (instanceId) => {
   return new Promise((resolve, reject) => {
     setTimeout(
       resolve(instancesSample.find((instanceSample) => instanceSample.id === instanceId)),
-      Math.random() * 1000
+      Math.random() * 1000,
     );
   });
 };
@@ -34,11 +28,9 @@ export const getFileDetails = (instanceId, symbolName) => {
   return new Promise((resolve, reject) => {
     setTimeout(
       resolve(
-        fileDetailsSamples.find(
-          (file) => file.instanceId === instanceId && file.symbolNames.includes(symbolName)
-        )
+        fileDetailsSamples.find((file) => file.instanceId === instanceId && file.symbolNames.includes(symbolName)),
       ),
-      mockDelay
+      mockDelay,
     );
   });
 };
@@ -52,12 +44,8 @@ export const getInstances = () => {
 export const getSymbols = (instanceId) => {
   return new Promise((resolve, reject) => {
     setTimeout(
-      resolve(
-        instanceId
-          ? symbolsSample.filter((symbol) => symbol.instanceId === instanceId)
-          : symbolsSample
-      ),
-      mockDelay
+      resolve(instanceId ? symbolsSample.filter((symbol) => symbol.instanceId === instanceId) : symbolsSample),
+      mockDelay,
     );
   });
 };
@@ -71,12 +59,8 @@ export const getFilesByInstanceId = (instanceId) => {
 export const getFiles = (instanceId, symbolName) => {
   return new Promise((resolve, reject) => {
     setTimeout(
-      resolve(
-        filesSample.filter(
-          (file) => file.instanceId === instanceId && file.symbolNames.includes(symbolName)
-        )
-      ),
-      mockDelay
+      resolve(filesSample.filter((file) => file.instanceId === instanceId && file.symbolNames.includes(symbolName))),
+      mockDelay,
     );
   });
 };
@@ -85,7 +69,7 @@ export const useFetchMockApi = (endpoint, params = [], onFetch) => {
   const [data, setData] = React.useState();
 
   const fetch = React.useCallback(async () => {
-    const result: FileDetails = await endpoint(...params);
+    const result = await endpoint(...params);
 
     onFetch?.();
     setData(result);
