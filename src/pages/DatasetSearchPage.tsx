@@ -1,5 +1,5 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import {
   Button,
@@ -12,16 +12,21 @@ import {
   Form,
   FormContextProvider,
   FormGroup,
+  Masthead,
+  MastheadBrand,
+  MastheadMain,
+  Page,
   Popover,
   useFormContext,
-} from "@patternfly/react-core";
-import HelpIcon from "@patternfly/react-icons/dist/esm/icons/help-icon";
+} from '@patternfly/react-core';
+import HelpIcon from '@patternfly/react-icons/dist/esm/icons/help-icon';
 
-import { FieldId } from "../types";
-import { useKsNavContext } from "../context";
-import { getFilePath, getInstanceVersion } from "../utils";
-import { SymbolSelect, InstanceSelect } from "../components";
-import { getFileDetails } from "../mockApi";
+import { FieldId } from '../types';
+import { useKsNavContext } from '../context';
+import { getFilePath, getInstanceVersion } from '../utils';
+import { SymbolSelect, InstanceSelect } from '../components';
+import { getFileDetails } from '../mockApi';
+import { MastheadLogo } from '../components/MastheadLogo';
 
 interface DatasetSearchPageInternalProps {
   instanceId: string | undefined;
@@ -39,79 +44,90 @@ const DatasetSearchPageInternal = ({ instanceId }: DatasetSearchPageInternalProp
 
       navigate(getFilePath(fileDetails?.id));
     },
-    [symbolName, instanceId, navigate]
+    [symbolName, instanceId, navigate],
   );
 
   return (
-    <Flex
-      alignItems={{ default: "alignItemsCenter" }}
-      justifyContent={{ default: "justifyContentCenter" }}
-      direction={{ default: "column" }}
-      style={{ height: "100%", backgroundColor: "#F0F0F0" }}
+    <Page
+      header={
+        <Masthead>
+          <MastheadMain>
+            <MastheadBrand>
+              <MastheadLogo />
+            </MastheadBrand>
+          </MastheadMain>
+        </Masthead>
+      }
     >
-      <Card isRounded isLarge style={{ width: "35%", padding: 30, minWidth: "500px" }}>
-        <CardTitle style={{ textAlign: "center" }}>Kernel Symbol Navigator</CardTitle>
+      <Flex
+        alignItems={{ default: 'alignItemsCenter' }}
+        justifyContent={{ default: 'justifyContentCenter' }}
+        direction={{ default: 'column' }}
+        style={{ height: '100%', backgroundColor: '#F0F0F0' }}
+      >
+        <Card isRounded isLarge style={{ width: '35%', padding: 30, minWidth: '500px' }}>
+          <CardTitle style={{ textAlign: 'center' }}>Kernel Symbol Navigator</CardTitle>
 
-        <CardBody>
-          <p className="pf-v5-u-mb-md pf-v5-u-color-400">
-            A place to analyze kernel source code and understand function call trees using generated
-            diagrams.
-          </p>
+          <CardBody>
+            <p className="pf-v5-u-mb-md pf-v5-u-color-400">
+              A place to analyze kernel source code and understand function call trees using generated diagrams.
+            </p>
 
-          <Form>
-            <FormGroup
-              fieldId={FieldId.InstanceVersion}
-              label="Dataset"
-              labelIcon={
-                <Popover bodyContent="Subset of the kernel based on a Linux version.">
-                  <Button
-                    variant="plain"
-                    aria-label="Dataset select info icon"
-                    className="pf-v5-c-form__group-label-help"
-                  >
-                    <HelpIcon />
-                  </Button>
-                </Popover>
-              }
+            <Form>
+              <FormGroup
+                fieldId={FieldId.InstanceVersion}
+                label="Dataset"
+                labelIcon={
+                  <Popover bodyContent="Subset of the kernel based on a Linux version.">
+                    <Button
+                      variant="plain"
+                      aria-label="Dataset select info icon"
+                      className="pf-v5-c-form__group-label-help"
+                    >
+                      <HelpIcon />
+                    </Button>
+                  </Popover>
+                }
+              >
+                <InstanceSelect placeholder="Select a version" />
+              </FormGroup>
+
+              <FormGroup
+                fieldId={FieldId.SymbolName}
+                label="Symbol"
+                labelIcon={
+                  <Popover bodyContent="Name of a kernel function or variable.">
+                    <Button
+                      variant="plain"
+                      aria-label="Symbol select info icon"
+                      className="pf-v5-c-form__group-label-help"
+                    >
+                      <HelpIcon />
+                    </Button>
+                  </Popover>
+                }
+              >
+                <SymbolSelect
+                  placeholder="Search by name"
+                  isDisabled={!instanceVersion}
+                  onSymbolSelect={(value) => setValue(FieldId.SymbolName, value)}
+                />
+              </FormGroup>
+            </Form>
+          </CardBody>
+          <CardFooter>
+            <Button
+              type={ButtonType.submit}
+              onClick={onSearch}
+              isDisabled={!symbolName || !instanceVersion}
+              style={{ width: 'fit-content', float: 'left' }}
             >
-              <InstanceSelect placeholder="Select a version" />
-            </FormGroup>
-
-            <FormGroup
-              fieldId={FieldId.SymbolName}
-              label="Symbol"
-              labelIcon={
-                <Popover bodyContent="Name of a kernel function or variable.">
-                  <Button
-                    variant="plain"
-                    aria-label="Symbol select info icon"
-                    className="pf-v5-c-form__group-label-help"
-                  >
-                    <HelpIcon />
-                  </Button>
-                </Popover>
-              }
-            >
-              <SymbolSelect
-                placeholder="Search by name"
-                isDisabled={!instanceVersion}
-                onSymbolSelect={(value) => setValue(FieldId.SymbolName, value)}
-              />
-            </FormGroup>
-          </Form>
-        </CardBody>
-        <CardFooter>
-          <Button
-            type={ButtonType.submit}
-            onClick={onSearch}
-            isDisabled={!symbolName || !instanceVersion}
-            style={{ width: "fit-content", float: "left" }}
-          >
-            Search
-          </Button>
-        </CardFooter>
-      </Card>
-    </Flex>
+              Search
+            </Button>
+          </CardFooter>
+        </Card>
+      </Flex>
+    </Page>
   );
 };
 
@@ -122,7 +138,7 @@ export const DatasetSearchPage = () => {
     <FormContextProvider
       initialValues={{
         [FieldId.InstanceVersion]: getInstanceVersion(selectedInstance),
-        [FieldId.SymbolName]: selectedSymbol?.name ?? "",
+        [FieldId.SymbolName]: selectedSymbol?.name ?? '',
       }}
     >
       <DatasetSearchPageInternal instanceId={selectedInstance?.id} />

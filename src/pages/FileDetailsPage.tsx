@@ -10,6 +10,9 @@ import {
   DrawerPanelContent,
   Flex,
   FlexItem,
+  Masthead,
+  MastheadBrand,
+  MastheadMain,
   Page,
   PageSidebar,
   PageSidebarBody,
@@ -21,6 +24,7 @@ import { getFileDetailsById } from '../mockApi';
 import { FileDetails, RoutePath, FocusedSymbol, UrlParam } from '../types';
 import { SymbolTopology, FileSourceCode, SymbolSearch, FileNav, FileBreadcrumb } from '../components';
 import { useKsNavContext } from '../context';
+import { MastheadLogo } from '../components/MastheadLogo';
 
 export const FileDetailsPage = () => {
   const navigate = useNavigate();
@@ -72,6 +76,15 @@ export const FileDetailsPage = () => {
   return (
     <Page
       isManagedSidebar
+      header={
+        <Masthead>
+          <MastheadMain>
+            <MastheadBrand>
+              <MastheadLogo />
+            </MastheadBrand>
+          </MastheadMain>
+        </Masthead>
+      }
       sidebar={
         <PageSidebar>
           <PageSidebarBody>
